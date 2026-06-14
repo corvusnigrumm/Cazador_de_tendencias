@@ -87,6 +87,11 @@ class ScoredTopic:
     # Recomendación editorial
     recommendation:   str  = ""
 
+    # Datos profundos KeySearch (Long Tail)
+    paa_questions: list = field(default_factory=list)
+    autocomplete_suggestions: list = field(default_factory=list)
+    related_queries_longtail: list = field(default_factory=list)
+
     # Atajos de acceso al topic original (para la UI)
     @property
     def keyword(self) -> str:

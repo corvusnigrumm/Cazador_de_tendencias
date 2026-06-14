@@ -281,6 +281,30 @@ def export_excel(
         for col in range(1, 5):
             ws_track.cell(row=3, column=col, value="")
 
+    # 4. Hoja dinámica: Expansión Long Tail (KeySearch)
+    ws_longtail = wb.create_sheet("Expansión Long Tail")
+    ws_longtail.append(["Tendencia Padre", "Tipo de Variación", "Keyword Long Tail / Pregunta"])
+    row_lt = 2
+    for s in scored_topics:
+        padre = s.keyword
+        for q in getattr(s, "paa_questions", []):
+            ws_longtail.cell(row=row_lt, column=1, value=padre)
+            ws_longtail.cell(row=row_lt, column=2, value="PAA (Pregunta Frecuente)")
+            ws_longtail.cell(row=row_lt, column=3, value=q)
+            row_lt += 1
+            
+        for q in getattr(s, "autocomplete_suggestions", []):
+            ws_longtail.cell(row=row_lt, column=1, value=padre)
+            ws_longtail.cell(row=row_lt, column=2, value="Autocompletado")
+            ws_longtail.cell(row=row_lt, column=3, value=q)
+            row_lt += 1
+            
+        for q in getattr(s, "related_queries_longtail", []):
+            ws_longtail.cell(row=row_lt, column=1, value=padre)
+            ws_longtail.cell(row=row_lt, column=2, value="Búsqueda Relacionada")
+            ws_longtail.cell(row=row_lt, column=3, value=q)
+            row_lt += 1
+
     wb.save(path)
     logger.info("Excel exportado → %s", path)
     return str(path)

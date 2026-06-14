@@ -61,6 +61,9 @@ from trendradar.output.display import (
 from trendradar.output.exporter import export_csv, export_json, export_excel
 from trendradar.ai.generator import generate_editorial_plan
 
+from trendradar.trends.keysearch.autocomplete import get_autocomplete_suggestions
+from trendradar.trends.keysearch.google_serp import scrape_google
+
 
 # ──────────────────────────────────────────────
 # Menús de selección
@@ -300,6 +303,29 @@ def run() -> None:
         scored_topics = scorer.score_all(raw_topics)
         print_status(f"Score calculado para {len(scored_topics)} temas.", kind="ok")
         console.print()
+
+        # ── 8.5 Expansión Deep Search (KeySearch) ───
+        ans_ks = input("  ¿Ejecutar expansión profunda (Long Tail) con KeySearch? Indica cantidad del top (0 para omitir, default 5): ").strip()
+        top_ks = int(ans_ks) if ans_ks.isdigit() else (0 if ans_ks == "0" else 5)
+        
+        if top_ks > 0 and scored_topics:
+            search_context = {"country_code": effective_geo.lower(), "language_code": "es"}
+            print_status(f"Iniciando expansión KeySearch para el Top {top_ks} temas...", kind="loading")
+            for i, st in enumerate(scored_topics[:top_ks], 1):
+                print_status(f"[{i}/{top_ks}] Minando subtemas para: '{st.keyword}'...", kind="loading")
+                
+                # Autocompletado
+                suggs = get_autocomplete_suggestions(st.keyword, expandir=False, search_context=search_context)
+                st.autocomplete_suggestions = suggs
+                
+                # PAA y Relacionadas (SERP)
+                def _dummy_cb(msg): pass
+                serp_data = scrape_google(st.keyword, progress_callback=_dummy_cb, search_context=search_context)
+                st.paa_questions = serp_data.get("preguntas_paa", [])
+                st.related_queries_longtail = serp_data.get("busquedas_relacionadas", [])
+                
+            print_status("Expansión KeySearch completada.", kind="ok")
+            console.print()
 
         # ── 9. Buscar noticias relacionadas ────────
         news_by_topic: dict = {}

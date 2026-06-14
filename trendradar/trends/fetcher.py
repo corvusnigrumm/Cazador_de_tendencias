@@ -184,38 +184,48 @@ class TrendsFetcher:
         NO usa pytrends. Es 100% estable.
 
         Returns:
-            Lista de keywords trending, máximo TOP_N_TRENDING items.
+            Lista de keywords trending de múltiples categorías.
         """
         geo = geo or self.geo
-        items = self._fetch_rss_items(geo)
-        keywords = [item["keyword"] for item in items]
-        return keywords[:TOP_N_TRENDING]
+        categories = ["all", "b", "e", "t", "s", "h", "m"]
+        all_keywords = []
+        seen = set()
+        for cat in categories:
+            items = self._fetch_rss_items(geo, cat)
+            for item in items:
+                kw = item["keyword"]
+                if kw.lower() not in seen:
+                    seen.add(kw.lower())
+                    all_keywords.append(kw)
+        return all_keywords
 
     def get_trending_with_rss_data(self, geo: Optional[str] = None) -> list[dict]:
         """
-        Extrae trending keywords CON datos adicionales del RSS:
-        tráfico aproximado, noticias embebidas, fecha de publicación.
-
+        Extrae trending keywords CON datos adicionales del RSS de múltiples categorías.
         Returns:
             Lista de dicts con keys: keyword, approx_traffic, pub_date, news[]
         """
         geo = geo or self.geo
-        return self._fetch_rss_items(geo)[:TOP_N_TRENDING]
+        categories = ["all", "b", "e", "t", "s", "h", "m"]
+        all_items = []
+        seen = set()
+        for cat in categories:
+            items = self._fetch_rss_items(geo, cat)
+            for item in items:
+                if item["keyword"].lower() not in seen:
+                    seen.add(item["keyword"].lower())
+                    all_items.append(item)
+        return all_items
 
-    def _fetch_rss_items(self, geo: str) -> list[dict]:
+    def _fetch_rss_items(self, geo: str, cat: str = "all") -> list[dict]:
         """
         Hace GET al RSS de Google Trends y parsea los items.
-
-        URL: https://trends.google.com/trending/rss?geo=CO
-
-        Cada item contiene:
-          - title (keyword trending)
-          - ht:approx_traffic ("1000+", "500+", etc.)
-          - pubDate
-          - ht:news_item[] (noticias relacionadas con título, URL, fuente)
         """
-        url = f"{_TRENDS_RSS_BASE}?{urlencode({'geo': geo})}"
-        logger.info("Fetching Google Trends RSS | geo=%s | url=%s", geo, url)
+        params = {"geo": geo}
+        if cat != "all":
+            params["cat"] = cat
+        url = f"{_TRENDS_RSS_BASE}?{urlencode(params)}"
+        logger.info("Fetching Google Trends RSS | geo=%s | cat=%s | url=%s", geo, cat, url)
 
         headers = {
             "User-Agent": (
