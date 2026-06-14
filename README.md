@@ -173,3 +173,4 @@ NEWS_FRESH_HOURS = 6       # Horas para considerar artículo "fresco"
 DISCOVER_THRESHOLD = 65    # Umbral para tier ALTO
 NEWS_CACHE_TTL = 900       # Segundos de caché de noticias (15 min)
 ```
+
