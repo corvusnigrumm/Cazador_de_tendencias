@@ -1,0 +1,12 @@
+# TrendRadar SEO - dependencias
+# Instalar: pip install -r requirements.txt
+
+pytrends==4.9.2
+requests==2.32.3
+rich==14.3.4
+feedparser==6.0.11
+pandas==2.2.3
+python-dateutil==2.9.0
+python-dotenv==1.0.1
+openpyxl==3.1.5
+groq==0.13.0

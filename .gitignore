@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.codex_deps/
+.codex_deps_user/
+exports/
+
+.env
+*.env
+!*.env.example
