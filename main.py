@@ -56,6 +56,7 @@ from trendradar.output.display import (
     print_scored_table,
     print_scored_detail,
     print_news_for_topic,
+    print_ai_summary,
 )
 from trendradar.output.exporter import export_csv, export_json, export_excel
 from trendradar.ai.generator import generate_editorial_plan
@@ -353,6 +354,7 @@ def run() -> None:
                 ai_data_by_topic[s.keyword] = res
             print_status("Generación IA completada.", kind="ok")
             console.print()
+            print_ai_summary(ai_data_by_topic)
 
         # ── 13. Exportar ───────────────────────────
         meta = {

@@ -438,3 +438,24 @@ def _relevance_bar(score: float, width: int = 5) -> str:
     pct    = int(score * 100)
     color  = "bold green" if pct >= 70 else ("yellow" if pct >= 40 else "dim white")
     return f"[{color}]{bar}[/{color}] [dim]{pct}%[/dim]"
+
+
+# ──────────────────────────────────────────────
+# Resumen de IA generada
+# ──────────────────────────────────────────────
+def print_ai_summary(ai_data_by_topic: dict) -> None:
+    """Muestra un resumen de los resultados generados por la IA en la consola."""
+    if not ai_data_by_topic:
+        return
+
+    console.print(Rule("[bold magenta]Planificación Editorial IA[/bold magenta]", style="magenta"))
+    console.print()
+
+    for keyword, data in ai_data_by_topic.items():
+        if not data:
+            continue
+        console.print(f"[bold white]Tema:[/bold white] [cyan]{keyword}[/cyan]")
+        console.print(f"  [bold]Ángulo:[/bold] {data.get('angulo', 'N/A')}")
+        console.print(f"  [bold]Clickbait:[/bold] [yellow]{data.get('clickbait', 'N/A')}[/yellow]")
+        console.print(f"  [bold]Entidades:[/bold] [dim]{data.get('entidades', 'N/A')}[/dim]")
+        console.print()

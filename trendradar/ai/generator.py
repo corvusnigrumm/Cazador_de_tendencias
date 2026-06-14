@@ -124,7 +124,7 @@ def _generate_with_hf(keyword: str, api_key: str) -> str:
             timeout=20,
         )
     except requests.RequestException as exc:
-        logger.warning("Hugging Face no disponible: %s", exc)
+        logger.warning("Hugging Face API falló la conexión (probablemente por DNS). Usando extracción local.")
         return "N/A"
 
     if response.status_code != 200:
