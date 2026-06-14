@@ -30,12 +30,8 @@ def generate_editorial_plan(keyword: str, news_context: list[str]) -> dict:
             result["angulo"] = _sanitize_ai_text(groq_res.get("angulo")) or result["angulo"]
             title = _sanitize_ai_text(groq_res.get("clickbait"))
             result["clickbait"] = _limit_title(title) or result["clickbait"]
-
-    hf_key = AI_CONFIG.get("hf_api_key")
-    if hf_key:
-        hf_res = _generate_with_hf(keyword, hf_key.strip())
-        if hf_res and hf_res != "N/A":
-            result["entidades"] = hf_res
+            if groq_res.get("entidades"):
+                result["entidades"] = _sanitize_ai_text(groq_res.get("entidades"))
 
     return result
 
@@ -77,6 +73,7 @@ Titulares recientes de competidores:
 Devuelve solo un objeto JSON valido con estas llaves:
 - "angulo": un enfoque unico para cubrir la tendencia sin repetir a la competencia. Maximo 2 oraciones.
 - "clickbait": un titulo llamativo, etico y claro. Maximo 60 caracteres.
+- "entidades": 5 a 10 entidades clave (personas, lugares, conceptos) relevantes, separadas por comas.
 
 No uses Markdown. No incluyas texto fuera del JSON.
 """
@@ -106,7 +103,7 @@ No uses Markdown. No incluyas texto fuera del JSON.
 
 def _generate_with_hf(keyword: str, api_key: str) -> str:
     model = AI_CONFIG["hf_model"]
-    api_url = f"https://api-inference.huggingface.co/models/{model}"
+    api_url = f"https://router.huggingface.co/hf-inference/models/{model}"
     headers = {"Authorization": f"Bearer {api_key}"}
     prompt = (
         f"Eres experto en SEO semantico. Dame 5 a 10 entidades relacionadas "
